@@ -1,0 +1,24 @@
+.App {
+  text-align: center;
+  padding: 20px;
+}
+
+.title {
+  color: #333;
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.map-wrapper {
+  display: inline-block;
+  width: 300px; /* Small space like a dashboard */
+  height: 300px;
+  border: 2px solid #ccc;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.map-container {
+  width: 100%;
+  height: 100%;
+}
