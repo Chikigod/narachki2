@@ -16,14 +16,13 @@ const customIcon = new L.Icon({
 const coffeeShopLocation = [41.799, 20.909];
 
 const jsonData = {
-  callTypeId: "W",
   localization: [
-    { language: "en", description: "Call Waiter" },
-    { language: "mk", description: "Повикај келнер" },
-    { language: "en", description: "Payment" },
-    { language: "mk", description: "Плаќање" },
-    { language: "en", description: "Custom Order" },
-    { language: "mk", description: "Прилагодена нарачка" }
+    { callTypeId: "W", language: "en", description: "Call Waiter" },
+    { callTypeId: "W", language: "mk", description: "Повикај келнер" },
+    { callTypeId: "P", language: "en", description: "Payment" },
+    { callTypeId: "P", language: "mk", description: "Плаќање" },
+    { callTypeId: "C", language: "en", description: "Custom Order" },
+    { callTypeId: "C", language: "mk", description: "Прилагодена нарачка" }
   ]
 };
 
@@ -53,7 +52,11 @@ function App() {
 
           if (locationAccuracy < 20) {
             const location = { lat: latitude, lng: longitude, accuracy: locationAccuracy };
-            const dataToSend = { ...formData, location };
+            const dataToSend = { 
+              ...formData, 
+              location,
+              orderTypeId: formData.orderType // Using orderType directly to send ID
+            };
             console.log('Form Data:', JSON.stringify(dataToSend));
           } else {
             setShowAccuracyAlert(true);
@@ -96,7 +99,7 @@ function App() {
           {jsonData.localization
             .filter(item => item.language === "en")
             .map((item, index) => (
-              <option key={index} value={item.description}>
+              <option key={index} value={item.callTypeId}>
                 {item.description}
               </option>
             ))}
