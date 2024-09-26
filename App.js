@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Circle } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import './index.css'; 
+import './index.css';
 import L from 'leaflet';
 
 const customIcon = new L.Icon({
@@ -13,28 +13,50 @@ const customIcon = new L.Icon({
   shadowSize: [41, 41],
 });
 
-const coffeeShopLocation = [41.799, 20.908];
+const coffeeShopLocation = [41.799, 20.909];
+
+const jsonData = {
+  callTypeId: "W",
+  localization: [
+    { language: "en", description: "Call Waiter" },
+    { language: "mk", description: "Повикај келнер" },
+    { language: "en", description: "Payment" },
+    { language: "mk", description: "Плаќање" },
+    { language: "en", description: "Custom Order" },
+    { language: "mk", description: "Прилагодена нарачка" }
+  ]
+};
 
 function App() {
   const [userLocation, setUserLocation] = useState(null);
-  const [accuracy, setAccuracy] = useState(null); 
-  const [isWaiterCalled, setIsWaiterCalled] = useState(false); 
-  const mapRef = useRef(); 
+  const [accuracy, setAccuracy] = useState(null);
+  const [showAccuracyAlert, setShowAccuracyAlert] = useState(false);
+  const [formData, setFormData] = useState({ name: '', orderType: '', location: {} });
+  const mapRef = useRef();
 
-  const handleCallWaiter = () => {
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
     if (navigator.geolocation) {
-      const watchId = navigator.geolocation.watchPosition(
+      navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude, accuracy: locationAccuracy } = position.coords;
-
-          console.log(`Location accuracy: ${locationAccuracy} meters`);
-
           setUserLocation([latitude, longitude]);
-          setAccuracy(locationAccuracy); 
-          setIsWaiterCalled(true); 
-          if (mapRef.current) {
-            const bounds = L.latLngBounds([[latitude, longitude], coffeeShopLocation]);
-            mapRef.current.fitBounds(bounds);
+          setAccuracy(locationAccuracy);
+
+          if (locationAccuracy < 20) {
+            const location = { lat: latitude, lng: longitude, accuracy: locationAccuracy };
+            const dataToSend = { ...formData, location };
+            console.log('Form Data:', JSON.stringify(dataToSend));
+          } else {
+            setShowAccuracyAlert(true);
           }
         },
         (error) => {
@@ -43,25 +65,49 @@ function App() {
         },
         { enableHighAccuracy: true }
       );
-
-      return () => navigator.geolocation.clearWatch(watchId);
     } else {
       alert('Geolocation is not supported by your browser.');
     }
   };
 
+  const handleCloseAccuracyAlert = () => {
+    setShowAccuracyAlert(false);
+  };
+
   return (
     <div className="App">
       <h1 className="title">Coffee Shop Order Tracking</h1>
-      
-      <div className="controls">
-        <button onClick={handleCallWaiter}>Call Waiter</button>
-      </div>
+      <form onSubmit={handleSubmit} className="order-form">
+        <input
+          type="text"
+          name="name"
+          value={formData.name}
+          onChange={handleChange}
+          placeholder="Your Name"
+          required
+        />
+        <select
+          name="orderType"
+          value={formData.orderType}
+          onChange={handleChange}
+          required
+        >
+          <option value="" disabled>Select Order Type</option>
+          {jsonData.localization
+            .filter(item => item.language === "en")
+            .map((item, index) => (
+              <option key={index} value={item.description}>
+                {item.description}
+              </option>
+            ))}
+        </select>
+        <button type="submit">Submit Order</button>
+      </form>
 
       <div className="map-wrapper">
         <MapContainer
-          center={coffeeShopLocation} 
-          zoom={20}
+          center={coffeeShopLocation}
+          zoom={18}
           className="map-container"
           whenCreated={(mapInstance) => { mapRef.current = mapInstance; }}
         >
@@ -69,13 +115,9 @@ function App() {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
-
-          {/* Coffee Shop Location Marker */}
           <Marker position={coffeeShopLocation} icon={customIcon}>
-            <Popup>Coffee Shop: You are here in Skopje!</Popup>
+            <Popup>Coffee Shop.</Popup>
           </Marker>
-
-          {/* User Location Marker and Accuracy Circle (when they call the waiter) */}
           {userLocation && (
             <>
               <Marker position={userLocation} icon={customIcon}>
@@ -93,10 +135,11 @@ function App() {
           )}
         </MapContainer>
       </div>
-      
-      {isWaiterCalled && (
-        <div className="notification">
-          <p>Waiter has been called! Your location is visible on the map.</p>
+
+      {showAccuracyAlert && (
+        <div className="accuracy-alert">
+          <p>Please turn on your GPS.</p>
+          <button onClick={handleCloseAccuracyAlert}>Close</button>
         </div>
       )}
     </div>
