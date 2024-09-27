@@ -42,25 +42,30 @@ function App() {
   };
 
   const showNotification = (message) => {
-    const audio = new Audio('/sound.wav');
-    audio.play();
-
-    if (navigator.vibrate) {
-      navigator.vibrate(200);
-    }
-
     if ("Notification" in window) {
       if (Notification.permission === "granted") {
-        new Notification(message);
-      } else if (Notification.permission !== "denied") {
+        const notification = new Notification(message);
+        notification.onshow = () => {
+          const audio = new Audio('/sound.wav'); 
+          audio.play();
+        };
+
+      } else if (Notification.permission === "default") {
         Notification.requestPermission().then((permission) => {
           if (permission === "granted") {
-            new Notification(message);
+            const notification = new Notification(message);
+
+            notification.onshow = () => {
+              const audio = new Audio('/sound.wav');
+              audio.play();
+            };
           }
         });
+      } else {
+        alert("Notifications are disabled. Please enable them in your browser settings.");
       }
     } else {
-      alert(message);
+      alert("This browser does not support notifications.");
     }
   };
 
@@ -73,7 +78,7 @@ function App() {
           setUserLocation([latitude, longitude]);
           setAccuracy(locationAccuracy);
 
-          if (locationAccuracy < 200000) {
+          if (locationAccuracy < 20) {
             const location = { lat: latitude, lng: longitude, accuracy: locationAccuracy };
 
             const userAgent = navigator.userAgent;
@@ -81,7 +86,7 @@ function App() {
             let deviceType = "Unknown Device";
             let browser = "Unknown Browser";
             let browserVersion = "Unknown Version";
-            let appVersion = "1.0.0";
+            let appVersion = "1.0.0"; // Replace this with actual app version logic if needed
             let timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
             let language = navigator.language || navigator.userLanguage; 
             let browserSize = { width: window.innerWidth, height: window.innerHeight }; 
@@ -145,9 +150,9 @@ function App() {
             if (orderType === "W") {
               showNotification("Your waiter has arrived!");
             } else if (orderType === "P") {
-              showNotification("Your waiter has arrived!");
+              showNotification("Your payment is processed!");
             } else if (orderType === "C") {
-              showNotification("Your waiter has arrived!");
+              showNotification("Your custom order is being prepared!");
             }
 
           } else {
