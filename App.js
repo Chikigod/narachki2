@@ -13,7 +13,7 @@ const customIcon = new L.Icon({
   shadowSize: [41, 41],
 });
 
-const coffeeShopLocation = [41.799, 20.909];
+const coffeeShopLocation = [41.981, 21.431];
 
 const jsonData = {
   localization: [
@@ -41,6 +41,29 @@ function App() {
     }));
   };
 
+  const showNotification = (message) => {
+    const audio = new Audio('/sound.wav');
+    audio.play();
+
+    if (navigator.vibrate) {
+      navigator.vibrate(200);
+    }
+
+    if ("Notification" in window) {
+      if (Notification.permission === "granted") {
+        new Notification(message);
+      } else if (Notification.permission !== "denied") {
+        Notification.requestPermission().then((permission) => {
+          if (permission === "granted") {
+            new Notification(message);
+          }
+        });
+      }
+    } else {
+      alert(message);
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (navigator.geolocation) {
@@ -50,14 +73,83 @@ function App() {
           setUserLocation([latitude, longitude]);
           setAccuracy(locationAccuracy);
 
-          if (locationAccuracy < 20) {
+          if (locationAccuracy < 200000) {
             const location = { lat: latitude, lng: longitude, accuracy: locationAccuracy };
+
+            const userAgent = navigator.userAgent;
+            let os = "Unknown OS";
+            let deviceType = "Unknown Device";
+            let browser = "Unknown Browser";
+            let browserVersion = "Unknown Version";
+            let appVersion = "1.0.0";
+            let timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            let language = navigator.language || navigator.userLanguage; 
+            let browserSize = { width: window.innerWidth, height: window.innerHeight }; 
+            let deviceScreenSize = { width: window.screen.width, height: window.screen.height };
+
+            if (userAgent.includes("Windows NT 10.0")) {
+              os = "Windows 11"; 
+              deviceType = "Desktop";
+            } else if (userAgent.includes("Mac OS X")) {
+              os = "Mac OS";
+              deviceType = "Desktop";
+            } else if (userAgent.includes("Linux")) {
+              os = "Linux";
+              deviceType = "Desktop";
+            } else if (userAgent.includes("Android")) {
+              os = "Android";
+              deviceType = "Mobile";
+            } else if (userAgent.includes("iPhone")) {
+              os = "iOS";
+              deviceType = "Mobile";
+            } else if (userAgent.includes("iPad")) {
+              os = "iOS";
+              deviceType = "Tablet";
+            } else if (userAgent.includes("Windows Phone")) {
+              os = "Windows Phone";
+              deviceType = "Mobile";
+            }
+
+            if (userAgent.includes("Chrome")) {
+              browser = "Chrome";
+              browserVersion = userAgent.match(/Chrome\/(\d+\.\d+\.\d+\.\d+)/)?.[1] || "Unknown Version";
+            } else if (userAgent.includes("Firefox")) {
+              browser = "Firefox";
+              browserVersion = userAgent.match(/Firefox\/(\d+\.\d+)/)?.[1] || "Unknown Version";
+            } else if (userAgent.includes("Safari") && !userAgent.includes("Chrome")) {
+              browser = "Safari";
+              browserVersion = userAgent.match(/Version\/(\d+\.\d+)/)?.[1] || "Unknown Version";
+            } else if (userAgent.includes("Edge")) {
+              browser = "Edge";
+              browserVersion = userAgent.match(/Edg\/(\d+\.\d+\.\d+\.\d+)/)?.[1] || "Unknown Version";
+            }
+
+            const { orderType, ...restFormData } = formData;
             const dataToSend = { 
-              ...formData, 
-              location,
-              orderTypeId: formData.orderType // Using orderType directly to send ID
+              name: restFormData.name, 
+              orderTypeId: orderType, 
+              location, 
+              deviceType, 
+              os, 
+              browser, 
+              browserVersion, 
+              appVersion, 
+              timeZone, 
+              language, 
+              browserSize, 
+              deviceScreenSize 
             };
+
             console.log('Form Data:', JSON.stringify(dataToSend));
+
+            if (orderType === "W") {
+              showNotification("Your waiter has arrived!");
+            } else if (orderType === "P") {
+              showNotification("Your waiter has arrived!");
+            } else if (orderType === "C") {
+              showNotification("Your waiter has arrived!");
+            }
+
           } else {
             setShowAccuracyAlert(true);
           }
