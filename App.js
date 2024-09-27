@@ -44,21 +44,31 @@ function App() {
   const showNotification = (message) => {
     if ("Notification" in window) {
       if (Notification.permission === "granted") {
-        const notification = new Notification(message);
-        notification.onshow = () => {
-          const audio = new Audio('/sound.wav'); 
-          audio.play();
+        const notification = new Notification(message, {
+          body: 'Click to view more details', // Optional body text
+          icon: 'https://example.com/icon.png' // Optional icon URL
+        });
+
+        notification.onclick = () => {
         };
+
+        const audio = new Audio('/sound.wav');
+        audio.play();
 
       } else if (Notification.permission === "default") {
         Notification.requestPermission().then((permission) => {
           if (permission === "granted") {
-            const notification = new Notification(message);
+            const notification = new Notification(message, {
+              body: 'Click to view more details', // Optional body text
+              icon: 'https://example.com/icon.png' // Optional icon URL
+            });
 
-            notification.onshow = () => {
-              const audio = new Audio('/sound.wav');
-              audio.play();
+            notification.onclick = () => {
+              // Logic for what happens when the notification is clicked
             };
+
+            const audio = new Audio('/sound.wav');
+            audio.play();
           }
         });
       } else {
@@ -150,9 +160,9 @@ function App() {
             if (orderType === "W") {
               showNotification("Your waiter has arrived!");
             } else if (orderType === "P") {
-              showNotification("Your payment is processed!");
+              showNotification("Your waiter has arrived!");
             } else if (orderType === "C") {
-              showNotification("Your custom order is being prepared!");
+              showNotification("Your waiter has arrived!");
             }
 
           } else {
@@ -238,7 +248,7 @@ function App() {
 
       {showAccuracyAlert && (
         <div className="accuracy-alert">
-          <p>Please turn on your GPS.</p>
+          <p>Turn on your GPS.</p>
           <button onClick={handleCloseAccuracyAlert}>Close</button>
         </div>
       )}
