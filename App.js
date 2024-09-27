@@ -45,8 +45,8 @@ function App() {
     if ("Notification" in window) {
       if (Notification.permission === "granted") {
         const notification = new Notification(message, {
-          body: 'Click to view more details', // Optional body text
-          icon: 'https://example.com/icon.png' // Optional icon URL
+          body: 'Click to view more details', 
+          icon: 'https://example.com/icon.png'
         });
 
         notification.onclick = () => {
@@ -59,12 +59,12 @@ function App() {
         Notification.requestPermission().then((permission) => {
           if (permission === "granted") {
             const notification = new Notification(message, {
-              body: 'Click to view more details', // Optional body text
-              icon: 'https://example.com/icon.png' // Optional icon URL
+              body: 'Click to view more details', 
+              icon: 'https://example.com/icon.png' 
             });
 
             notification.onclick = () => {
-              // Logic for what happens when the notification is clicked
+          
             };
 
             const audio = new Audio('/sound.wav');
