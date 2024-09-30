@@ -1,9 +1,11 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Circle } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import './index.css';
 import L from 'leaflet';
 import { Carousel } from 'react-responsive-carousel';
+import { toast, ToastContainer } from 'react-toastify'; // Importing toast for notifications
+import 'react-toastify/dist/ReactToastify.css'; // Import the CSS for notifications
 
 const customIcon = new L.Icon({
   iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
@@ -22,6 +24,15 @@ const Home = () => {
   const [formData, setFormData] = useState({ name: '', orderType: '', location: {} });
   const mapRef = useRef();
 
+  useEffect(() => {
+    // Check if the user is authenticated
+    const token = localStorage.getItem('token');
+    if (!token) {
+      // Redirect to login if not authenticated
+      window.location.href = '/login';
+    }
+  }, []);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -32,6 +43,8 @@ const Home = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    console.log('Submit event triggered'); // Debug log
+
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -39,19 +52,42 @@ const Home = () => {
           setUserLocation([latitude, longitude]); // Update user location
           setAccuracy(locationAccuracy);
 
-          if (locationAccuracy < 20) {
-            const location = { lat: latitude, lng: longitude, accuracy: locationAccuracy };
-            const dataToSend = { 
-              name: formData.name, 
-              orderTypeId: formData.orderType, 
-              location 
-            };
-            console.log('Form Data:', JSON.stringify(dataToSend));
+          // Log all required information to console
+          const deviceType = navigator.userAgent; // Get device type
+          const screenSize = `${window.innerWidth}x${window.innerHeight}`; // Get screen size
+          const os = navigator.platform; // Get operating system
+          const browser = navigator.userAgent; // Get browser information
+
+          const dataToSend = { 
+            name: formData.name, 
+            orderTypeId: formData.orderType, 
+            location: { lat: latitude, lng: longitude },
+            locationAccuracy,
+            screenSize,
+            deviceType,
+            os,
+            browser
+          };
+
+          // Log the full form data
+          console.log('Form Data:', JSON.stringify(dataToSend));
+
+          // Check location accuracy and handle accordingly
+          if (locationAccuracy > 20) {
+            console.log('Location accuracy is greater than 20 meters:', locationAccuracy); // Debug log
+            toast.warn('Turn on GPS please.'); // Notification for low accuracy
+            return; // Prevent further action
           }
+
+          // Show success notification if accuracy is acceptable
+          toast.success('Order submitted successfully!');
+
+          // Clear form after submission
+          setFormData({ name: '', orderType: '', location: {} });
         },
         (error) => {
           console.error('Error getting location:', error);
-          alert('Unable to retrieve your location.');
+          toast.error('Unable to retrieve your location.');
         },
         { enableHighAccuracy: true }
       );
@@ -60,6 +96,7 @@ const Home = () => {
 
   return (
     <div>
+      <ToastContainer /> {/* Add ToastContainer here */}
       <h1 className="title">Coffee Shop Order Tracking</h1>
 
       {/* Smaller Carousel */}
