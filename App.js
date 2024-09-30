@@ -2,11 +2,11 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom'; 
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
-import { store, persistor } from './store/store'; // Import the store and persistor
+import { store, persistor } from './store/store'; 
 import Login from './Login'; 
 import Register from './Register'; 
 import Home from './Home';  
-import PrivateRoute from './PrivateRoute'; // Import the PrivateRoute component
+import PrivateRoute from './PrivateRoute'; 
 
 function App() {
   return (
