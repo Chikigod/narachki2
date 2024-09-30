@@ -9,6 +9,14 @@ function Register() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        // Password validation: minimum 8 characters and at least 1 digit
+        const passwordRegex = /^(?=.*\d)[A-Za-z\d]{8,}$/;
+        if (!passwordRegex.test(password)) {
+            alert('Password must be at least 8 characters long and contain at least 1 digit.');
+            return;
+        }
+
         if (password !== confirmPassword) {
             alert('Passwords do not match!');
             return;
