@@ -8,6 +8,7 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+// Custom marker icon
 const customIcon = new L.Icon({
   iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
   iconSize: [25, 41],
@@ -18,6 +19,29 @@ const customIcon = new L.Icon({
 });
 
 const coffeeShopLocation = [41.981, 21.431]; // Coffee shop coordinates
+
+// Function to detect operating system
+const getOperatingSystem = () => {
+  const { userAgent } = navigator;
+  if (userAgent.indexOf('Windows NT 10.0') !== -1) return 'Windows 10';
+  if (userAgent.indexOf('Windows NT 11.0') !== -1) return 'Windows 11';
+  if (userAgent.indexOf('Mac OS X') !== -1) return 'Mac OS';
+  if (userAgent.indexOf('Linux') !== -1) return 'Linux';
+  if (userAgent.indexOf('Android') !== -1) return 'Android';
+  if (userAgent.indexOf('iPhone') !== -1 || userAgent.indexOf('iPad') !== -1) return 'iOS';
+  return 'Unknown OS';
+};
+
+// Function to detect browser
+const getBrowser = () => {
+  const { userAgent } = navigator;
+  if (userAgent.indexOf('Chrome') !== -1) return 'Chrome';
+  if (userAgent.indexOf('Safari') !== -1 && userAgent.indexOf('Chrome') === -1) return 'Safari';
+  if (userAgent.indexOf('Firefox') !== -1) return 'Firefox';
+  if (userAgent.indexOf('MSIE') !== -1 || userAgent.indexOf('Trident/') !== -1) return 'Internet Explorer';
+  if (userAgent.indexOf('Edge') !== -1) return 'Edge';
+  return 'Unknown Browser';
+};
 
 const Home = () => {
   const [userLocation, setUserLocation] = useState(null); // User's location initially null
@@ -42,19 +66,19 @@ const Home = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Submit event triggered'); 
+    console.log('Submit event triggered');
 
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude, accuracy: locationAccuracy } = position.coords;
-          setUserLocation([latitude, longitude]); 
+          setUserLocation([latitude, longitude]); // Update user location
           setAccuracy(locationAccuracy);
 
-          const deviceType = navigator.userAgent;
-          const screenSize = `${window.innerWidth}x${window.innerHeight}`;
-          const os = navigator.platform;
-          const browser = navigator.userAgent;
+          // Get detailed device info
+          const screenSize = `${window.innerWidth}x${window.innerHeight}`; // Screen size
+          const os = getOperatingSystem(); // Detect OS
+          const browser = getBrowser(); // Detect Browser
 
           const dataToSend = {
             name: formData.name,
@@ -62,25 +86,24 @@ const Home = () => {
             location: { lat: latitude, lng: longitude },
             locationAccuracy,
             screenSize,
-            deviceType,
-            os,
-            browser,
+            os, // Include the detected OS
+            browser, // Include the detected Browser
           };
 
-          console.log('Form Data:', JSON.stringify(dataToSend)); 
+          // Log the full form data without deviceType
+          console.log('Form Data:', JSON.stringify(dataToSend));
 
           if (locationAccuracy > 20) {
-            toast.warn('Turn on GPS please.'); 
+            toast.warn('Turn on GPS please.'); // Notification for low accuracy
             return;
           }
 
-          toast.success('Order submitted successfully!'); 
-
-          setFormData({ name: '', orderType: '', location: {} }); 
+          toast.success('Order submitted successfully!'); // Success notification
+          setFormData({ name: '', orderType: '', location: {} }); // Clear form
         },
         (error) => {
           console.error('Error getting location:', error);
-          toast.error('Unable to retrieve your location.'); 
+          toast.error('Unable to retrieve your location.'); // Error notification
         },
         { enableHighAccuracy: true }
       );
