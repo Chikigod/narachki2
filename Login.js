@@ -5,6 +5,7 @@ function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
+    const [error, setError] = useState('');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -18,17 +19,19 @@ function Login() {
             });
 
             const data = await response.json();
+
             if (response.ok) {
-                localStorage.setItem('token', data.accessToken);
+                // Store the token in local storage
+                localStorage.setItem('user', JSON.stringify({ token: data.accessToken }));
                 console.log('Login successful:', data.accessToken);
                 navigate('/home');
             } else {
                 console.error('Login failed:', data.message);
-                alert('Login failed. Please check your credentials.');
+                setError(data.message); 
             }
         } catch (error) {
             console.error('Error logging in:', error);
-            alert('An error occurred. Please try again.');
+            setError('An error occurred. Please try again.'); 
         }
     };
 
@@ -52,6 +55,7 @@ function Login() {
                 />
                 <button type="submit">Login</button>
             </form>
+            {error && <p style={{ color: 'red' }}>{error}</p>} {/* Display error message */}
             <p>
                 Don't have an account? <Link to="/register">Register</Link>
             </p>
