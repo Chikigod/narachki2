@@ -4,8 +4,9 @@ import 'leaflet/dist/leaflet.css';
 import './index.css';
 import L from 'leaflet';
 import { Carousel } from 'react-responsive-carousel';
-import { toast, ToastContainer } from 'react-toastify'; // Importing toast for notifications
-import 'react-toastify/dist/ReactToastify.css'; // Import the CSS for notifications
+import "react-responsive-carousel/lib/styles/carousel.min.css";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const customIcon = new L.Icon({
   iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
@@ -16,20 +17,18 @@ const customIcon = new L.Icon({
   shadowSize: [41, 41],
 });
 
-const coffeeShopLocation = [41.981, 21.431];
+const coffeeShopLocation = [41.981, 21.431]; // Coffee shop coordinates
 
 const Home = () => {
-  const [userLocation, setUserLocation] = useState(coffeeShopLocation); // Default to coffee shop
+  const [userLocation, setUserLocation] = useState(null); // User's location initially null
   const [accuracy, setAccuracy] = useState(null);
   const [formData, setFormData] = useState({ name: '', orderType: '', location: {} });
   const mapRef = useRef();
 
   useEffect(() => {
-    // Check if the user is authenticated
     const token = localStorage.getItem('token');
     if (!token) {
-      // Redirect to login if not authenticated
-      window.location.href = '/login';
+      window.location.href = '/login'; // Redirect if not authenticated
     }
   }, []);
 
@@ -43,51 +42,45 @@ const Home = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Submit event triggered'); // Debug log
+    console.log('Submit event triggered'); 
 
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude, accuracy: locationAccuracy } = position.coords;
-          setUserLocation([latitude, longitude]); // Update user location
+          setUserLocation([latitude, longitude]); 
           setAccuracy(locationAccuracy);
 
-          // Log all required information to console
-          const deviceType = navigator.userAgent; // Get device type
-          const screenSize = `${window.innerWidth}x${window.innerHeight}`; // Get screen size
-          const os = navigator.platform; // Get operating system
-          const browser = navigator.userAgent; // Get browser information
+          const deviceType = navigator.userAgent;
+          const screenSize = `${window.innerWidth}x${window.innerHeight}`;
+          const os = navigator.platform;
+          const browser = navigator.userAgent;
 
-          const dataToSend = { 
-            name: formData.name, 
-            orderTypeId: formData.orderType, 
+          const dataToSend = {
+            name: formData.name,
+            orderTypeId: formData.orderType,
             location: { lat: latitude, lng: longitude },
             locationAccuracy,
             screenSize,
             deviceType,
             os,
-            browser
+            browser,
           };
 
-          // Log the full form data
-          console.log('Form Data:', JSON.stringify(dataToSend));
+          console.log('Form Data:', JSON.stringify(dataToSend)); 
 
-          // Check location accuracy and handle accordingly
           if (locationAccuracy > 20) {
-            console.log('Location accuracy is greater than 20 meters:', locationAccuracy); // Debug log
-            toast.warn('Turn on GPS please.'); // Notification for low accuracy
-            return; // Prevent further action
+            toast.warn('Turn on GPS please.'); 
+            return;
           }
 
-          // Show success notification if accuracy is acceptable
-          toast.success('Order submitted successfully!');
+          toast.success('Order submitted successfully!'); 
 
-          // Clear form after submission
-          setFormData({ name: '', orderType: '', location: {} });
+          setFormData({ name: '', orderType: '', location: {} }); 
         },
         (error) => {
           console.error('Error getting location:', error);
-          toast.error('Unable to retrieve your location.');
+          toast.error('Unable to retrieve your location.'); 
         },
         { enableHighAccuracy: true }
       );
@@ -96,22 +89,29 @@ const Home = () => {
 
   return (
     <div>
-      <ToastContainer /> {/* Add ToastContainer here */}
-      <h1 className="title">Coffee Shop Order Tracking</h1>
+      <ToastContainer />
+      <h1 className="title">Coffee Shop Order Tracking</h1> 
 
-      {/* Smaller Carousel */}
       <div className="carousel-container">
-        <Carousel showArrows={true} autoPlay={true} infiniteLoop={true}>
+        <Carousel
+          showArrows={true}
+          autoPlay={true}
+          infiniteLoop={true}
+          showThumbs={false}
+          showStatus={false}
+          interval={3000}
+          stopOnHover={true}
+        >
           <div>
-            <img src="\coffee-stock-600x450.jpg" alt="Carousel 1" />
+            <img src="/coffee-stock-600x450.jpg" alt="Coffee" />
             <p className="legend">Coffee</p>
           </div>
           <div>
-            <img src="\Orangejuice.jpg" alt="Carousel 2" />
+            <img src="/Orangejuice.jpg" alt="Orange Juice" />
             <p className="legend">Juice</p>
           </div>
           <div>
-            <img src="\easy_chocolate_cake_slice-500x500.jpg" alt="Carousel 3" />
+            <img src="/easy_chocolate_cake_slice-500x500.jpg" alt="Chocolate Cake" />
             <p className="legend">Cake</p>
           </div>
         </Carousel>
@@ -140,9 +140,8 @@ const Home = () => {
         <button type="submit">Submit</button>
       </form>
 
-      {/* Display map */}
       <MapContainer
-        center={userLocation || coffeeShopLocation}
+        center={userLocation || coffeeShopLocation} // Center on user or coffee shop
         zoom={15}
         ref={mapRef}
         style={{ height: "400px", width: "100%" }}
@@ -151,9 +150,19 @@ const Home = () => {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
-        <Marker position={userLocation || coffeeShopLocation} icon={customIcon}>
-          <Popup>Your current location</Popup>
+
+        {/* Marker for user's location if available */}
+        {userLocation && (
+          <Marker position={userLocation} icon={customIcon}>
+            <Popup>Your current location</Popup>
+          </Marker>
+        )}
+
+        {/* Marker for coffee shop location */}
+        <Marker position={coffeeShopLocation} icon={customIcon}>
+          <Popup>Coffee Shop Location</Popup>
         </Marker>
+
         {userLocation && (
           <Circle
             center={userLocation}
