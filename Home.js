@@ -8,7 +8,7 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-// Custom icon for leaflet map marker
+
 const customIcon = new L.Icon({
   iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
   iconSize: [25, 41],
@@ -18,12 +18,12 @@ const customIcon = new L.Icon({
   shadowSize: [41, 41],
 });
 
-// Define constants
-const coffeeShopLocation = [41.981, 21.431]; // Coffee shop coordinates
-const APP_VERSION = "1.0.0"; // Define your app version here
-const LOCATION_ACCURACY_THRESHOLD = 20000; // Define location accuracy threshold in meters
 
-// Function to detect operating system
+const coffeeShopLocation = [41.981, 21.431]; 
+const APP_VERSION = "1.0.0"; 
+const LOCATION_ACCURACY_THRESHOLD = 20; 
+
+
 const getOperatingSystem = () => {
   const { userAgent } = navigator;
   if (userAgent.indexOf('Windows NT 10.0') !== -1) return 'Windows 10';
@@ -35,7 +35,7 @@ const getOperatingSystem = () => {
   return 'Unknown OS';
 };
 
-// Function to detect browser
+
 const getBrowser = () => {
   const { userAgent } = navigator;
   if (userAgent.indexOf('Chrome') !== -1) return 'Chrome';
@@ -46,7 +46,7 @@ const getBrowser = () => {
   return 'Unknown Browser';
 };
 
-// Function to request notification permission
+
 const requestNotificationPermission = () => {
   if ("Notification" in window) {
     if (Notification.permission === "default" || Notification.permission === "denied") {
@@ -59,36 +59,36 @@ const requestNotificationPermission = () => {
   }
 };
 
-// Function to play sound on notification
+
 const playNotificationSound = () => {
-  const audio = new Audio('/sound.wav'); // Adjust the path if necessary
+  const audio = new Audio('/sound.wav'); 
   audio.play();
 };
 
-// Function to trigger vibration on devices that support it
+
 const triggerVibration = () => {
   if ("vibrate" in navigator) {
-    navigator.vibrate([200, 100, 200]); // Vibration pattern
+    navigator.vibrate([200, 100, 200]);
   }
 };
 
-// Function to show system notification with sound and vibration
+
 const showNotification = (message) => {
   if (Notification.permission === "granted") {
     const options = {
       body: message,
-      icon: '/waiter-icon.png', // Optional: Add a path to an icon for the notification
+      icon: '/waiter-icon.png', 
     };
     new Notification("Coffee Shop", options);
 
-    // Play sound and trigger vibration
+    
     playNotificationSound();
     triggerVibration();
   }
 };
 
 const Home = () => {
-  const [userLocation, setUserLocation] = useState(null); // User's location initially null
+  const [userLocation, setUserLocation] = useState(null); 
   const [accuracy, setAccuracy] = useState(null);
   const [formData, setFormData] = useState({ name: '', orderType: '', location: {} });
   const mapRef = useRef();
@@ -96,10 +96,10 @@ const Home = () => {
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
-      window.location.href = '/login'; // Redirect if not authenticated
+      window.location.href = '/login'; 
     }
 
-    // Request notification permission when the app loads
+    
     requestNotificationPermission();
   }, []);
 
@@ -119,16 +119,16 @@ const Home = () => {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude, accuracy: locationAccuracy } = position.coords;
-          setUserLocation([latitude, longitude]); // Update user location
-          setAccuracy(locationAccuracy); // Update location accuracy
+          setUserLocation([latitude, longitude]); 
+          setAccuracy(locationAccuracy); 
 
-          // Get detailed device info
-          const screenSize = `${window.innerWidth}x${window.innerHeight}`; // Screen size
-          const os = getOperatingSystem(); // Detect OS
-          const browser = getBrowser(); // Detect Browser
-          const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone; // Get local time zone
+          
+          const screenSize = `${window.innerWidth}x${window.innerHeight}`; 
+          const os = getOperatingSystem(); 
+          const browser = getBrowser(); 
+          const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone; 
 
-          // Only log if locationAccuracy is less than or equal to the threshold
+    
           if (locationAccuracy <= LOCATION_ACCURACY_THRESHOLD) {
             const dataToSend = {
               name: formData.name,
@@ -136,30 +136,30 @@ const Home = () => {
               location: { lat: latitude, lng: longitude },
               locationAccuracy,
               screenSize,
-              os, // Include the detected OS
-              browser, // Include the detected Browser
-              timeZone, // Include local time zone
-              appVersion: APP_VERSION, // Include app version
+              os,
+              browser, 
+              timeZone, 
+              appVersion: APP_VERSION, 
             };
 
-            // Log the full form data
+           
             console.log('Form Data:', JSON.stringify(dataToSend));
 
-            // Show the system notification after a successful submission
+           
             showNotification("Waiter is coming.");
           }
 
           if (locationAccuracy > LOCATION_ACCURACY_THRESHOLD) {
-            toast.warn('Turn on GPS please.'); // Notification for low accuracy
+            toast.warn('Turn on GPS please.'); 
             return;
           }
 
-          toast.success('Order submitted successfully!'); // Success notification
-          setFormData({ name: '', orderType: '', location: {} }); // Clear form
+          toast.success('Order submitted successfully!'); 
+          setFormData({ name: '', orderType: '', location: {} }); 
         },
         (error) => {
           console.error('Error getting location:', error);
-          toast.error('Unable to retrieve your location.'); // Error notification
+          toast.error('Unable to retrieve your location.'); 
         },
         { enableHighAccuracy: true }
       );
@@ -220,7 +220,7 @@ const Home = () => {
       </form>
 
       <MapContainer
-        center={userLocation || coffeeShopLocation} // Center on user or coffee shop
+        center={userLocation || coffeeShopLocation}
         zoom={15}
         ref={mapRef}
         style={{ height: "400px", width: "100%" }}
