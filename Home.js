@@ -80,18 +80,21 @@ const Home = () => {
           const os = getOperatingSystem(); // Detect OS
           const browser = getBrowser(); // Detect Browser
 
-          const dataToSend = {
-            name: formData.name,
-            orderTypeId: formData.orderType,
-            location: { lat: latitude, lng: longitude },
-            locationAccuracy,
-            screenSize,
-            os, // Include the detected OS
-            browser, // Include the detected Browser
-          };
+          // Only log if locationAccuracy is less than or equal to 20 meters
+          if (locationAccuracy <= 20) {
+            const dataToSend = {
+              name: formData.name,
+              orderTypeId: formData.orderType,
+              location: { lat: latitude, lng: longitude },
+              locationAccuracy,
+              screenSize,
+              os, // Include the detected OS
+              browser, // Include the detected Browser
+            };
 
-          // Log the full form data without deviceType
-          console.log('Form Data:', JSON.stringify(dataToSend));
+            // Log the full form data
+            console.log('Form Data:', JSON.stringify(dataToSend));
+          }
 
           if (locationAccuracy > 20) {
             toast.warn('Turn on GPS please.'); // Notification for low accuracy
