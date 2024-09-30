@@ -6,13 +6,9 @@ import { store, persistor } from './store/store'; // Import the store and persis
 import Login from './Login'; 
 import Register from './Register'; 
 import Home from './Home';  
+import PrivateRoute from './PrivateRoute'; // Import the PrivateRoute component
 
 function App() {
-  const isAuthenticated = () => {
-    const userData = JSON.parse(localStorage.getItem('user'));
-    return userData && userData.token; 
-  };
-
   return (
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
@@ -23,7 +19,7 @@ function App() {
               <Route path="/register" element={<Register />} />
               <Route path="/login" element={<Login />} />
               <Route path="/" element={<Navigate to="/register" />} />
-              <Route path="/home" element={isAuthenticated() ? <Home /> : <Navigate to="/login" />} />
+              <Route path="/home" element={<PrivateRoute element={<Home />} />} /> {/* Use PrivateRoute here */}
             </Routes>
           </div>
         </Router>
