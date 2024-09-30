@@ -19,6 +19,8 @@ const customIcon = new L.Icon({
 });
 
 const coffeeShopLocation = [41.981, 21.431]; // Coffee shop coordinates
+const APP_VERSION = "1.0.0"; // Define your app version here
+const LOCATION_ACCURACY_THRESHOLD = 20; // Define location accuracy threshold in meters
 
 // Function to detect operating system
 const getOperatingSystem = () => {
@@ -73,15 +75,16 @@ const Home = () => {
         (position) => {
           const { latitude, longitude, accuracy: locationAccuracy } = position.coords;
           setUserLocation([latitude, longitude]); // Update user location
-          setAccuracy(locationAccuracy);
+          setAccuracy(locationAccuracy); // Update location accuracy
 
           // Get detailed device info
           const screenSize = `${window.innerWidth}x${window.innerHeight}`; // Screen size
           const os = getOperatingSystem(); // Detect OS
           const browser = getBrowser(); // Detect Browser
+          const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone; // Get local time zone
 
-          // Only log if locationAccuracy is less than or equal to 20 meters
-          if (locationAccuracy <= 20) {
+          // Only log if locationAccuracy is less than or equal to the threshold
+          if (locationAccuracy <= LOCATION_ACCURACY_THRESHOLD) {
             const dataToSend = {
               name: formData.name,
               orderTypeId: formData.orderType,
@@ -90,13 +93,15 @@ const Home = () => {
               screenSize,
               os, // Include the detected OS
               browser, // Include the detected Browser
+              timeZone, // Include local time zone
+              appVersion: APP_VERSION, // Include app version
             };
 
             // Log the full form data
             console.log('Form Data:', JSON.stringify(dataToSend));
           }
 
-          if (locationAccuracy > 20) {
+          if (locationAccuracy > LOCATION_ACCURACY_THRESHOLD) {
             toast.warn('Turn on GPS please.'); // Notification for low accuracy
             return;
           }
