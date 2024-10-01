@@ -5,18 +5,18 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Register application services
-builder.Services.AddSingleton<UserService>(); // Register UserService
-builder.Services.AddSingleton<JwtService>(); // Register JwtService
 
-// Add controllers
+builder.Services.AddSingleton<UserService>(); 
+builder.Services.AddSingleton<JwtService>(); 
+
+
 builder.Services.AddControllers();
 
-// Add Swagger/OpenAPI support
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Configure CORS
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp",
@@ -25,7 +25,7 @@ builder.Services.AddCors(options =>
                           .AllowAnyHeader());
 });
 
-// Configure authentication with JWT
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -47,21 +47,21 @@ builder.Services.AddAuthentication(options =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline (for development)
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
         c.SwaggerEndpoint("/swagger/v1/swagger.json", "Coffee Shop API V1");
-        c.RoutePrefix = "swagger"; // Swagger UI at /swagger
+        c.RoutePrefix = "swagger";
     });
 }
 
-// Enable CORS for the React app
+
 app.UseCors("AllowReactApp");
 
-// Enable authentication and authorization middleware
+
 app.UseAuthentication();
 app.UseAuthorization();
 
