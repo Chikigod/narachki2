@@ -1,16 +1,18 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux'; // Import useDispatch
+import { loginUser } from './actions'; // Import your login action
 
 function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
-    const [error, setError] = useState('');
+    const dispatch = useDispatch(); // Initialize useDispatch
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch('http://localhost:5000/api/login', {
+            const response = await fetch('https://localhost:7118/api/User/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -19,19 +21,18 @@ function Login() {
             });
 
             const data = await response.json();
-
             if (response.ok) {
-                // Store the token in local storage
-                localStorage.setItem('user', JSON.stringify({ token: data.accessToken }));
+                // Dispatch the login action with user data
+                dispatch(loginUser({ email, token: data.accessToken })); // Adjust this as necessary
                 console.log('Login successful:', data.accessToken);
                 navigate('/home');
             } else {
                 console.error('Login failed:', data.message);
-                setError(data.message); 
+                alert('Login failed. Please check your credentials.');
             }
         } catch (error) {
             console.error('Error logging in:', error);
-            setError('An error occurred. Please try again.'); 
+            alert('An error occurred. Please try again.');
         }
     };
 
@@ -55,7 +56,6 @@ function Login() {
                 />
                 <button type="submit">Login</button>
             </form>
-            {error && <p style={{ color: 'red' }}>{error}</p>} {/* Display error message */}
             <p>
                 Don't have an account? <Link to="/register">Register</Link>
             </p>

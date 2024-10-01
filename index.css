@@ -1,3 +1,4 @@
+/* index.css */
 
 .App {
   text-align: center;
@@ -23,6 +24,7 @@
   width: 100%;
   height: 100%;
 }
+
 .accuracy-alert {
   position: fixed;
   top: 20%;
@@ -35,22 +37,52 @@
   z-index: 1000;
 }
 
-.carousel-container {
-  width: 100%;
-  max-width: 100px;
-  margin: 0 auto;
+/* Carousel Styles */
+.carousel-image {
+  width: 100%; /* Ensures images fit the width of the carousel */
+  height: 250px; /* Set a fixed height for images */
+  object-fit: cover; /* Ensures images cover the entire area without distortion */
 }
 
-.carousel .slide img {
-  width: 100%;
-  height: auto;
+.carousel-container {
+  width: 50%; /* Adjust this value to make the carousel smaller */
+  margin: 0 auto; /* Center the carousel */
+}
+
+/* Set a fixed height for the carousel */
+.carousel {
+  height: 250px; /* Set a fixed height for the carousel */
+}
+
+/* Adjusting the button size under the carousel */
+.carousel .carousel-control {
+  font-size: 10px; /* Adjust the font size of the buttons */
+  width: 20px; /* Set a smaller width for the buttons */
+  height: 20px; /* Set a smaller height for the buttons */
 }
 
 .carousel .legend {
-  background-color: rgba(0, 0, 0, 0.7); /* Semi-transparent background */
-  color: #fff;
-  font-size: 16px;
-  padding: 5px;
+  font-size: 12px; /* Optionally, adjust the legend font size */
 }
 
+/* For better button visibility */
+.carousel .carousel-control:focus {
+  outline: none; /* Remove outline for focused state */
+}
+
+.carousel .carousel-control:hover {
+  background-color: rgba(0, 0, 0, 0.5); /* Change background on hover */
+  color: white; /* Change text color on hover */
+}
+/* index.css */
+/* Adjusting the size of the thumbnails */
+.carousel .thumb {
+  height: 40px; /* Set the height for the thumbnails */
+  width: auto;  /* Keep the width auto to maintain aspect ratio */
+}
+
+.carousel .thumb img {
+  height: 100%; /* Ensure the image fills the height of the thumbnail */
+  object-fit: cover; /* Cover the area without distortion */
+}
 

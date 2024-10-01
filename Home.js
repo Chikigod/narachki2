@@ -1,14 +1,12 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Circle } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import './index.css';
 import L from 'leaflet';
+import "react-responsive-carousel/lib/styles/carousel.min.css"; // Importing carousel styles
 import { Carousel } from 'react-responsive-carousel';
-import "react-responsive-carousel/lib/styles/carousel.min.css";
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import './index.css'; // Importing your custom styles
 
-
+// Custom Leaflet icon for markers
 const customIcon = new L.Icon({
   iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
   iconSize: [25, 41],
@@ -18,91 +16,52 @@ const customIcon = new L.Icon({
   shadowSize: [41, 41],
 });
 
+// Default location for the coffee shop
+const coffeeShopLocation = [41.981, 21.431]; // Replace with your coffee shop's latitude and longitude
 
-const coffeeShopLocation = [41.981, 21.431]; 
-const APP_VERSION = "1.0.0"; 
-const LOCATION_ACCURACY_THRESHOLD = 20; 
+// Define your app version
+const appVersion = "1.0.0"; // Change this to your actual app version
 
-
-const getOperatingSystem = () => {
-  const { userAgent } = navigator;
-  if (userAgent.indexOf('Windows NT 10.0') !== -1) return 'Windows 10';
-  if (userAgent.indexOf('Windows NT 11.0') !== -1) return 'Windows 11';
-  if (userAgent.indexOf('Mac OS X') !== -1) return 'Mac OS';
-  if (userAgent.indexOf('Linux') !== -1) return 'Linux';
-  if (userAgent.indexOf('Android') !== -1) return 'Android';
-  if (userAgent.indexOf('iPhone') !== -1 || userAgent.indexOf('iPad') !== -1) return 'iOS';
-  return 'Unknown OS';
-};
-
-
-const getBrowser = () => {
-  const { userAgent } = navigator;
-  if (userAgent.indexOf('Chrome') !== -1) return 'Chrome';
-  if (userAgent.indexOf('Safari') !== -1 && userAgent.indexOf('Chrome') === -1) return 'Safari';
-  if (userAgent.indexOf('Firefox') !== -1) return 'Firefox';
-  if (userAgent.indexOf('MSIE') !== -1 || userAgent.indexOf('Trident/') !== -1) return 'Internet Explorer';
-  if (userAgent.indexOf('Edge') !== -1) return 'Edge';
-  return 'Unknown Browser';
-};
-
-
-const requestNotificationPermission = () => {
-  if ("Notification" in window) {
-    if (Notification.permission === "default" || Notification.permission === "denied") {
-      Notification.requestPermission().then((permission) => {
-        if (permission === "granted") {
-          console.log("Notification permission granted.");
-        }
-      });
-    }
-  }
-};
-
-
-const playNotificationSound = () => {
-  const audio = new Audio('/sound.wav'); 
-  audio.play();
-};
-
-
-const triggerVibration = () => {
-  if ("vibrate" in navigator) {
-    navigator.vibrate([200, 100, 200]);
-  }
-};
-
-
-const showNotification = (message) => {
-  if (Notification.permission === "granted") {
-    const options = {
-      body: message,
-      icon: '/waiter-icon.png', 
-    };
-    new Notification("Coffee Shop", options);
-
-    
-    playNotificationSound();
-    triggerVibration();
-  }
-};
-
-const Home = () => {
-  const [userLocation, setUserLocation] = useState(null); 
+function Home() {
+  const [userLocation, setUserLocation] = useState(coffeeShopLocation); 
   const [accuracy, setAccuracy] = useState(null);
-  const [formData, setFormData] = useState({ name: '', orderType: '', location: {} });
+  const [formData, setFormData] = useState({ name: '', orderType: '' });
+  const [notificationVisible, setNotificationVisible] = useState(false);
   const mapRef = useRef();
 
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      window.location.href = '/login'; 
+  // Function to get the browser name from the user agent string
+  const getBrowserName = (userAgent) => {
+    if (userAgent.indexOf("Chrome") > -1) {
+      return "Chrome";
+    } else if (userAgent.indexOf("Firefox") > -1) {
+      return "Firefox";
+    } else if (userAgent.indexOf("Safari") > -1) {
+      return "Safari";
+    } else if (userAgent.indexOf("MSIE") > -1 || userAgent.indexOf("Trident") > -1) {
+      return "Internet Explorer";
+    } else {
+      return "Unknown Browser";
     }
+  };
 
-    
-    requestNotificationPermission();
-  }, []);
+  // Function to get the operating system from the user agent string
+  const getOSName = (userAgent) => {
+    if (userAgent.indexOf("Win") > -1) {
+      return "Windows";
+    } else if (userAgent.indexOf("Mac") > -1) {
+      return "MacOS";
+    } else if (userAgent.indexOf("X11") > -1 || userAgent.indexOf("Linux") > -1) {
+      return "Linux";
+    } else if (userAgent.indexOf("Android") > -1) {
+      return "Android";
+    } else if (userAgent.indexOf("like Mac") > -1) {
+      return "iOS";
+    } else {
+      return "Unknown OS";
+    }
+  };
 
+  // Handle form field changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -111,147 +70,143 @@ const Home = () => {
     }));
   };
 
+  // Handle form submission to get user location
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Submit event triggered');
-
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude, accuracy: locationAccuracy } = position.coords;
           setUserLocation([latitude, longitude]); 
-          setAccuracy(locationAccuracy); 
+          setAccuracy(locationAccuracy);
 
-          
-          const screenSize = `${window.innerWidth}x${window.innerHeight}`; 
-          const os = getOperatingSystem(); 
-          const browser = getBrowser(); 
-          const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone; 
-
-    
-          if (locationAccuracy <= LOCATION_ACCURACY_THRESHOLD) {
-            const dataToSend = {
-              name: formData.name,
-              orderTypeId: formData.orderType,
-              location: { lat: latitude, lng: longitude },
-              locationAccuracy,
-              screenSize,
-              os,
-              browser, 
-              timeZone, 
-              appVersion: APP_VERSION, 
-            };
-
-           
-            console.log('Form Data:', JSON.stringify(dataToSend));
-
-           
-            showNotification("Waiter is coming.");
+          // Check location accuracy
+          if (locationAccuracy > 200007777) {
+            alert("Please turn on your GPS"); // Notify user to turn on GPS
+            return; // Prevent form submission
           }
 
-          if (locationAccuracy > LOCATION_ACCURACY_THRESHOLD) {
-            toast.warn('Turn on GPS please.'); 
-            return;
-          }
+          // Get browser, OS, window size, device size, and time zone
+          const userAgent = navigator.userAgent;
+          const browserName = getBrowserName(userAgent); // Get the specific browser name
+          const osName = getOSName(userAgent); // Get the specific OS name
+          const windowSize = { width: window.innerWidth, height: window.innerHeight };
+          const deviceSize = { width: window.screen.width, height: window.screen.height };
+          const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone; // Get the time zone
 
-          toast.success('Order submitted successfully!'); 
-          setFormData({ name: '', orderType: '', location: {} }); 
+          // Log form data to the console
+          const dataToSend = { 
+            name: formData.name, 
+            orderTypeId: formData.orderType, 
+            location: { lat: latitude, lng: longitude, accuracy: locationAccuracy },
+            browser: browserName, // Add the browser name to the data
+            os: osName, // Add the OS name to the data
+            appVersion, // Add the app version to the data
+            windowSize, // Add the window size to the data
+            deviceSize, // Add the device size to the data
+            timeZone // Add the time zone to the data
+          };
+          console.log('Form Data:', JSON.stringify(dataToSend));
+
+          // Show notification after form submission
+          setNotificationVisible(true);
+
+          // Display system notification for the waiter
+          if (Notification.permission === "granted") {
+            new Notification("Waiter is coming!");
+          } else if (Notification.permission !== "denied") {
+            Notification.requestPermission().then((permission) => {
+              if (permission === "granted") {
+                new Notification("Waiter is coming!");
+              }
+            });
+          }
         },
         (error) => {
           console.error('Error getting location:', error);
-          toast.error('Unable to retrieve your location.'); 
+          alert('Unable to retrieve your location.');
         },
         { enableHighAccuracy: true }
       );
     }
   };
 
+  // Function to dismiss the notification
+  const dismissNotification = () => {
+    setNotificationVisible(false);
+  };
+
   return (
     <div>
-      <ToastContainer />
-      <h1 className="title">Coffee Shop Order Tracking</h1>
-
-      <div className="carousel-container">
-        <Carousel
-          showArrows={true}
-          autoPlay={true}
-          infiniteLoop={true}
-          showThumbs={false}
-          showStatus={false}
-          interval={3000}
-          stopOnHover={true}
-        >
-          <div>
-            <img src="/coffee-stock-600x450.jpg" alt="Coffee" />
-            <p className="legend">Coffee</p>
-          </div>
-          <div>
-            <img src="/Orangejuice.jpg" alt="Orange Juice" />
-            <p className="legend">Juice</p>
-          </div>
-          <div>
-            <img src="/easy_chocolate_cake_slice-500x500.jpg" alt="Chocolate Cake" />
-            <p className="legend">Cake</p>
-          </div>
-        </Carousel>
-      </div>
-
-      <form onSubmit={handleSubmit} className="order-form">
-        <input
-          type="text"
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-          placeholder="Your Name"
-          required
+      <h1>Welcome to the Coffee Shop</h1>
+      <form onSubmit={handleSubmit}>
+        <input 
+          type="text" 
+          name="name" 
+          value={formData.name} 
+          onChange={handleChange} 
+          placeholder="Your Name" 
+          required 
         />
-        <select
-          name="orderType"
-          value={formData.orderType}
-          onChange={handleChange}
+        <select 
+          name="orderType" 
+          value={formData.orderType} 
+          onChange={handleChange} 
           required
         >
-          <option value="" disabled>Select Order Type</option>
-          <option value="W">Call Waiter</option>
-          <option value="P">Payment</option>
-          <option value="C">Custom Order</option>
+          <option value="">Select Order Type</option>
+          <option value="callWaiter">Call Waiter</option>
+          <option value="payment">Payment</option>
+          <option value="customOrder">Custom Order</option>
         </select>
-        <button type="submit">Submit</button>
+        <button type="submit">Submit Order</button>
       </form>
 
-      <MapContainer
-        center={userLocation || coffeeShopLocation}
-        zoom={15}
-        ref={mapRef}
-        style={{ height: "400px", width: "100%" }}
-      >
+      {/* Notification for Order Submission */}
+      {notificationVisible && (
+        <div className="notification">
+          <p>Your order has been submitted successfully!</p>
+          <button onClick={dismissNotification}>Dismiss</button>
+        </div>
+      )}
+
+      {/* Map Display */}
+      <MapContainer center={userLocation} zoom={13} ref={mapRef} style={{ height: "400px", width: "100%" }}>
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
-
-        {/* Marker for user's location if available */}
-        {userLocation && (
-          <Marker position={userLocation} icon={customIcon}>
-            <Popup>Your current location</Popup>
-          </Marker>
-        )}
-
-        {/* Marker for coffee shop location */}
+        {/* User Location Marker */}
+        <Marker position={userLocation} icon={customIcon}>
+          <Popup>Your current location</Popup>
+        </Marker>
+        <Circle center={userLocation} radius={accuracy} fillColor="blue" />
+        
+        {/* Coffee Shop Location Marker */}
         <Marker position={coffeeShopLocation} icon={customIcon}>
           <Popup>Coffee Shop Location</Popup>
         </Marker>
-
-        {userLocation && (
-          <Circle
-            center={userLocation}
-            radius={accuracy}
-            pathOptions={{ color: 'blue', fillColor: 'blue' }}
-          />
-        )}
       </MapContainer>
+
+      {/* Carousel Component */}
+      <div className="carousel-container">
+        <Carousel showThumbs={true} thumbWidth={40}>
+          <div>
+            <img src="\coffee-stock-600x450.jpg" alt="Coffee" className="carousel-image" />
+            <p className="legend">Slide 1</p>
+          </div>
+          <div>
+            <img src="\Orangejuice.jpg" alt="Juice" className="carousel-image" />
+            <p className="legend">Slide 2</p>
+          </div>
+          <div>
+            <img src="\easy_chocolate_cake_slice-500x500.jpg" alt="Cake" className="carousel-image" />
+            <p className="legend">Slide 3</p>
+          </div>
+        </Carousel>
+      </div>
     </div>
   );
-};
+}
 
 export default Home;

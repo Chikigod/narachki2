@@ -9,21 +9,13 @@ function Register() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
-        // Password validation: minimum 8 characters and at least 1 digit
-        const passwordRegex = /^(?=.*\d)[A-Za-z\d]{8,}$/;
-        if (!passwordRegex.test(password)) {
-            alert('Password must be at least 8 characters long and contain at least 1 digit.');
-            return;
-        }
-
         if (password !== confirmPassword) {
             alert('Passwords do not match!');
             return;
         }
 
         try {
-            const response = await fetch('http://localhost:5000/api/register', {
+            const response = await fetch('https://localhost:7118/api/User/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -31,13 +23,13 @@ function Register() {
                 body: JSON.stringify({ email, password }),
             });
 
-            const data = await response.json();
+            const data = await response.text(); // Change to .text() first
             if (response.ok) {
-                console.log('Registration successful:', data.message);
+                console.log('Registration successful:', data);
                 navigate('/login');
             } else {
-                console.error('Registration failed:', data.message);
-                alert(data.message);
+                console.error('Registration failed:', data);
+                alert(data); // Alert the raw error message
             }
         } catch (error) {
             console.error('Error registering:', error);
