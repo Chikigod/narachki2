@@ -37,52 +37,51 @@
   z-index: 1000;
 }
 
-/* Carousel Styles */
+
 .carousel-image {
-  width: 100%; /* Ensures images fit the width of the carousel */
-  height: 250px; /* Set a fixed height for images */
-  object-fit: cover; /* Ensures images cover the entire area without distortion */
+  width: 100%; 
+  height: 250px; 
+  object-fit: cover; 
 }
 
 .carousel-container {
-  width: 50%; /* Adjust this value to make the carousel smaller */
-  margin: 0 auto; /* Center the carousel */
+  width: 50%; 
+  margin: 0 auto; 
 }
 
-/* Set a fixed height for the carousel */
+
 .carousel {
-  height: 250px; /* Set a fixed height for the carousel */
+  height: 250px; 
 }
 
-/* Adjusting the button size under the carousel */
+
 .carousel .carousel-control {
-  font-size: 10px; /* Adjust the font size of the buttons */
-  width: 20px; /* Set a smaller width for the buttons */
-  height: 20px; /* Set a smaller height for the buttons */
+  font-size: 10px; 
+  width: 20px; 
+  height: 20px; 
 }
 
 .carousel .legend {
-  font-size: 12px; /* Optionally, adjust the legend font size */
+  font-size: 12px; 
 }
 
-/* For better button visibility */
+
 .carousel .carousel-control:focus {
-  outline: none; /* Remove outline for focused state */
+  outline: none; 
 }
 
 .carousel .carousel-control:hover {
-  background-color: rgba(0, 0, 0, 0.5); /* Change background on hover */
-  color: white; /* Change text color on hover */
+  background-color: rgba(0, 0, 0, 0.5); 
+  color: white; 
 }
-/* index.css */
-/* Adjusting the size of the thumbnails */
+
 .carousel .thumb {
-  height: 40px; /* Set the height for the thumbnails */
-  width: auto;  /* Keep the width auto to maintain aspect ratio */
+  height: 40px; 
+  width: auto;  
 }
 
 .carousel .thumb img {
-  height: 100%; /* Ensure the image fills the height of the thumbnail */
-  object-fit: cover; /* Cover the area without distortion */
+  height: 100%; 
+  object-fit: cover; 
 }
 

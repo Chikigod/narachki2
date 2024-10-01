@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useDispatch } from 'react-redux'; // Import useDispatch
-import { loginUser } from './actions'; // Import your login action
+import { useDispatch } from 'react-redux'; 
+import { loginUser } from './actions'; 
 
 function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const navigate = useNavigate();
-    const dispatch = useDispatch(); // Initialize useDispatch
+    const dispatch = useDispatch(); 
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -22,8 +22,8 @@ function Login() {
 
             const data = await response.json();
             if (response.ok) {
-                // Dispatch the login action with user data
-                dispatch(loginUser({ email, token: data.accessToken })); // Adjust this as necessary
+                
+                dispatch(loginUser({ email, token: data.accessToken })); 
                 console.log('Login successful:', data.accessToken);
                 navigate('/home');
             } else {

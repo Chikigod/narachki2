@@ -1,4 +1,3 @@
-// src/actions.js
 
 export const loginUser = (userData) => {
     return {

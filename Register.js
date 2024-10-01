@@ -23,13 +23,13 @@ function Register() {
                 body: JSON.stringify({ email, password }),
             });
 
-            const data = await response.text(); // Change to .text() first
+            const data = await response.text(); 
             if (response.ok) {
                 console.log('Registration successful:', data);
                 navigate('/login');
             } else {
                 console.error('Registration failed:', data);
-                alert(data); // Alert the raw error message
+                alert(data);
             }
         } catch (error) {
             console.error('Error registering:', error);

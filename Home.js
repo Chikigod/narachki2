@@ -2,11 +2,11 @@ import React, { useState, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Circle } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-import "react-responsive-carousel/lib/styles/carousel.min.css"; // Importing carousel styles
+import "react-responsive-carousel/lib/styles/carousel.min.css"; 
 import { Carousel } from 'react-responsive-carousel';
-import './index.css'; // Importing your custom styles
+import './index.css'; 
 
-// Custom Leaflet icon for markers
+
 const customIcon = new L.Icon({
   iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
   iconSize: [25, 41],
@@ -16,11 +16,11 @@ const customIcon = new L.Icon({
   shadowSize: [41, 41],
 });
 
-// Default location for the coffee shop
-const coffeeShopLocation = [41.981, 21.431]; // Replace with your coffee shop's latitude and longitude
 
-// Define your app version
-const appVersion = "1.0.0"; // Change this to your actual app version
+const coffeeShopLocation = [41.981, 21.431];
+
+
+const appVersion = "1.0.0"; 
 
 function Home() {
   const [userLocation, setUserLocation] = useState(coffeeShopLocation); 
@@ -29,7 +29,7 @@ function Home() {
   const [notificationVisible, setNotificationVisible] = useState(false);
   const mapRef = useRef();
 
-  // Function to get the browser name from the user agent string
+  
   const getBrowserName = (userAgent) => {
     if (userAgent.indexOf("Chrome") > -1) {
       return "Chrome";
@@ -44,7 +44,7 @@ function Home() {
     }
   };
 
-  // Function to get the operating system from the user agent string
+ 
   const getOSName = (userAgent) => {
     if (userAgent.indexOf("Win") > -1) {
       return "Windows";
@@ -61,7 +61,6 @@ function Home() {
     }
   };
 
-  // Handle form field changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -70,7 +69,7 @@ function Home() {
     }));
   };
 
-  // Handle form submission to get user location
+  
   const handleSubmit = (e) => {
     e.preventDefault();
     if (navigator.geolocation) {
@@ -80,38 +79,38 @@ function Home() {
           setUserLocation([latitude, longitude]); 
           setAccuracy(locationAccuracy);
 
-          // Check location accuracy
-          if (locationAccuracy > 200007777) {
-            alert("Please turn on your GPS"); // Notify user to turn on GPS
-            return; // Prevent form submission
+          
+          if (locationAccuracy > 20) {
+            alert("Please turn on your GPS"); 
+            return; 
           }
 
-          // Get browser, OS, window size, device size, and time zone
+          
           const userAgent = navigator.userAgent;
-          const browserName = getBrowserName(userAgent); // Get the specific browser name
-          const osName = getOSName(userAgent); // Get the specific OS name
+          const browserName = getBrowserName(userAgent); 
+          const osName = getOSName(userAgent); 
           const windowSize = { width: window.innerWidth, height: window.innerHeight };
           const deviceSize = { width: window.screen.width, height: window.screen.height };
-          const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone; // Get the time zone
+          const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone; 
 
-          // Log form data to the console
+         
           const dataToSend = { 
             name: formData.name, 
             orderTypeId: formData.orderType, 
             location: { lat: latitude, lng: longitude, accuracy: locationAccuracy },
-            browser: browserName, // Add the browser name to the data
-            os: osName, // Add the OS name to the data
-            appVersion, // Add the app version to the data
-            windowSize, // Add the window size to the data
-            deviceSize, // Add the device size to the data
-            timeZone // Add the time zone to the data
+            browser: browserName, 
+            os: osName, 
+            appVersion, 
+            windowSize, 
+            deviceSize, 
+            timeZone 
           };
           console.log('Form Data:', JSON.stringify(dataToSend));
 
-          // Show notification after form submission
+          
           setNotificationVisible(true);
 
-          // Display system notification for the waiter
+          
           if (Notification.permission === "granted") {
             new Notification("Waiter is coming!");
           } else if (Notification.permission !== "denied") {
@@ -131,7 +130,7 @@ function Home() {
     }
   };
 
-  // Function to dismiss the notification
+  
   const dismissNotification = () => {
     setNotificationVisible(false);
   };

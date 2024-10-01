@@ -1,9 +1,9 @@
-// src/store.js
+
 import { createStore } from 'redux';
 import { persistStore, persistReducer } from 'redux-persist';
 import storage from 'redux-persist/lib/storage';
 import { combineReducers } from 'redux';
-import userReducer from './Reducers'; // Ensure this matches the case of your actual file name
+import userReducer from './Reducers'; 
 
 const persistConfig = {
   key: 'root',
@@ -12,7 +12,7 @@ const persistConfig = {
 
 const rootReducer = combineReducers({
   user: userReducer,
-  // add other reducers here
+  
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
