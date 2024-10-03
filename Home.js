@@ -6,7 +6,6 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Carousel } from 'react-responsive-carousel';
 import './index.css'; 
 
-
 const customIcon = new L.Icon({
   iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
   iconSize: [25, 41],
@@ -16,20 +15,16 @@ const customIcon = new L.Icon({
   shadowSize: [41, 41],
 });
 
-
 const coffeeShopLocation = [41.981, 21.431];
-
-
 const appVersion = "1.0.0"; 
 
-function Home() {
+function Home({ updateOrders }) { // Accept updateOrders as a prop
   const [userLocation, setUserLocation] = useState(coffeeShopLocation); 
   const [accuracy, setAccuracy] = useState(null);
   const [formData, setFormData] = useState({ name: '', orderType: '' });
   const [notificationVisible, setNotificationVisible] = useState(false);
   const mapRef = useRef();
 
-  
   const getBrowserName = (userAgent) => {
     if (userAgent.indexOf("Chrome") > -1) {
       return "Chrome";
@@ -44,7 +39,6 @@ function Home() {
     }
   };
 
- 
   const getOSName = (userAgent) => {
     if (userAgent.indexOf("Win") > -1) {
       return "Windows";
@@ -69,7 +63,6 @@ function Home() {
     }));
   };
 
-  
   const handleSubmit = (e) => {
     e.preventDefault();
     if (navigator.geolocation) {
@@ -79,13 +72,11 @@ function Home() {
           setUserLocation([latitude, longitude]); 
           setAccuracy(locationAccuracy);
 
-          
           if (locationAccuracy > 20) {
             alert("Please turn on your GPS"); 
             return; 
           }
 
-          
           const userAgent = navigator.userAgent;
           const browserName = getBrowserName(userAgent); 
           const osName = getOSName(userAgent); 
@@ -93,11 +84,10 @@ function Home() {
           const deviceSize = { width: window.screen.width, height: window.screen.height };
           const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone; 
 
-         
           const dataToSend = { 
             name: formData.name, 
             orderTypeId: formData.orderType, 
-            location: { lat: latitude, lng: longitude, accuracy: locationAccuracy },
+            location: { lat: latitude, lng: longitude }, // Use the user's location for the order
             browser: browserName, 
             os: osName, 
             appVersion, 
@@ -107,10 +97,11 @@ function Home() {
           };
           console.log('Form Data:', JSON.stringify(dataToSend));
 
-          
+          // Call updateOrders to pass the order data to the parent component
+          updateOrders(dataToSend); // Pass the order data up
+
           setNotificationVisible(true);
 
-          
           if (Notification.permission === "granted") {
             new Notification("Waiter is coming!");
           } else if (Notification.permission !== "denied") {
@@ -130,7 +121,6 @@ function Home() {
     }
   };
 
-  
   const dismissNotification = () => {
     setNotificationVisible(false);
   };
