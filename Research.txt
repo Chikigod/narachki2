@@ -1,0 +1,85 @@
+-Location accuracy
+-Dropdown
+-How to integrate a map
+-Best location accuracy for public event: 5-20m
+-Forms in console: location(lng,lat), browser, OS, app version, time zone, screen size, language
+-System notification with sound and vibration
+-Carousel
+-C# API
+-JWT-token
+-React-redux persistent store
+-Guard in react js
+-Live location updates
+-Multiple orders shown on map
+-Mobile app in react-native
+-Web-view in react-native
+-Radius for location accuracy
+-APK file
+-Web app styling
+
+
+1.Home.js
+{
+  "name": "John Doe",  
+  "orderTypeId": "callWaiter", 
+  "location": {  
+    "lat": 41.981,
+    "lng": 21.431
+  },
+  "browser": "Chrome", 
+  "os": "Windows",  
+  "appVersion": "1.0.0",  
+  "windowSize": {  
+    "width": 1920,
+    "height": 1080
+  },
+  "deviceSize": {  
+    "width": 1920,
+    "height": 1080
+  },
+  "timeZone": "America/New_York",  
+  "accuracy": 10,  
+  "distanceToCoffeeShop": 0.5  
+}
+
+2.Login.js
+{
+    "email": "user@example.com",
+    "password": "userpassword"
+}
+
+3.Register.js
+{
+    "email": "user@example.com",
+    "password": "userpassword"
+}
+
+4.WaiterView.js
+{
+  "waiterLocation": {
+    "latitude": 41.981,
+    "longitude": 21.431       //Live location updates
+  },
+  "accuracy": 10,
+  "orders": [
+    {
+      "name": "Order 1",
+      "orderTypeId": "Call Waiter",
+      "location": {
+        "lat": 41.982,
+        "lng": 21.432
+      }
+    },
+    {
+      "name": "Order 2",
+      "orderTypeId": "Payment",
+      "location": {
+        "lat": 41.983,
+        "lng": 21.433
+      }
+    }
+    // More orders can be included in this array
+  ]
+}
+
+
