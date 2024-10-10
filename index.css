@@ -11,18 +11,24 @@
   margin-bottom: 20px;
 }
 
+/* Boxed map styling */
 .map-wrapper {
-  display: inline-block;
-  width: 300px;
-  height: 300px;
-  border: 2px solid #ccc;
-  border-radius: 10px;
-  overflow: hidden;
+  width: 400px; /* Match the width from WaiterView */
+  height: 400px; /* Match the height from WaiterView */
+  border: 2px solid #4CAF50; /* Green border */
+  border-radius: 10px; /* Rounded corners */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Shadow for depth */
+  overflow: hidden; /* Prevents overflow */
+  margin: 20px auto; /* Center the box */
+  background-color: #fff; /* White background */
 }
 
+/* Additional wrapper for map to create padding */
 .map-container {
   width: 100%;
   height: 100%;
+  padding: 10px; /* Padding inside the box */
+  box-sizing: border-box; /* Include padding in width/height calculations */
 }
 
 .accuracy-alert {
@@ -37,51 +43,86 @@
   z-index: 1000;
 }
 
-
-.carousel-image {
-  width: 100%; 
-  height: 250px; 
-  object-fit: cover; 
-}
-
 .carousel-container {
-  width: 50%; 
-  margin: 0 auto; 
+  width: 50%; /* Maintain the compact width */
+  max-width: 400px; /* Maximum width */
+  margin: 0 auto; /* Center the carousel */
+  border-radius: 10px; /* Rounded corners */
+  overflow: hidden; /* Prevent overflow */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2); /* Reduced shadow for depth */
 }
-
 
 .carousel {
-  height: 250px; 
+  height: 180px; /* Adjusted height for the carousel */
+  display: flex; /* Align items */
+  justify-content: center; /* Center the items */
+  align-items: center; /* Center items vertically */
 }
 
+.carousel img {
+  max-height: 100%; /* Ensure the image does not exceed carousel height */
+  width: auto; /* Allow width to adjust */
+  height: auto; /* Keep the image's aspect ratio */
+  object-fit: contain; /* Ensures the entire image fits inside the container */
+  transition: transform 0.5s ease; /* Smooth zoom effect */
+}
+
+.carousel img:hover {
+  transform: scale(1.05); /* Slight zoom on hover */
+}
 
 .carousel .carousel-control {
-  font-size: 10px; 
-  width: 20px; 
-  height: 20px; 
-}
-
-.carousel .legend {
-  font-size: 12px; 
-}
-
-
-.carousel .carousel-control:focus {
-  outline: none; 
+  font-size: 12px; /* Control size */
+  width: 25px; /* Control button width */
+  height: 25px; /* Control button height */
+  background-color: rgba(255, 255, 255, 0.8); /* Light background for controls */
+  border-radius: 50%; /* Circular controls */
+  transition: background-color 0.3s ease; /* Smooth transition for hover effect */
 }
 
 .carousel .carousel-control:hover {
-  background-color: rgba(0, 0, 0, 0.5); 
-  color: white; 
+  background-color: rgba(255, 255, 255, 1); /* Full white on hover */
+  color: #4CAF50; /* Green color on hover */
 }
 
 .carousel .thumb {
-  height: 40px; 
-  width: auto;  
+  height: 30px; /* Decrease thumb height */
+  width: auto; 
+  margin: 5px; /* Space between thumbs */
 }
 
 .carousel .thumb img {
   height: 100%; 
-  object-fit: cover; 
+  object-fit: cover; /* Maintain aspect ratio */
+  border-radius: 5px; /* Rounded corners for thumbs */
 }
 
+
+
+
+
+
+/* Button styles */
+button {
+  background-color: #4CAF50; /* Green color used in login page */
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 15px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #45a049; /* Darker green on hover */
+}
+
+/* Form input styles */
+input, select {
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  width: 200px;
+}

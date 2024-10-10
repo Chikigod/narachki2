@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Circle } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
@@ -18,8 +18,8 @@ const customIcon = new L.Icon({
 const coffeeShopLocation = [41.981, 21.431];
 const appVersion = "1.0.0"; 
 
-function Home({ updateOrders }) { // Accept updateOrders as a prop
-  const [userLocation, setUserLocation] = useState(coffeeShopLocation); 
+function Home({ updateOrders }) {
+  const [userLocations, setUserLocations] = useState([]);
   const [accuracy, setAccuracy] = useState(null);
   const [formData, setFormData] = useState({ name: '', orderType: '' });
   const [notificationVisible, setNotificationVisible] = useState(false);
@@ -55,6 +55,34 @@ function Home({ updateOrders }) { // Accept updateOrders as a prop
     }
   };
 
+  const haversineDistance = (coord1, coord2) => {
+    const R = 6371; // Radius of the Earth in kilometers
+    const dLat = (coord2.lat - coord1.lat) * (Math.PI / 180);
+    const dLon = (coord2.lng - coord1.lng) * (Math.PI / 180);
+
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(coord1.lat * (Math.PI / 180)) * Math.cos(coord2.lat * (Math.PI / 180)) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    return R * c; // Distance in kilometers
+  };
+
+  const checkRadiusMeeting = (location) => {
+    const coffeeShopRadius = 50; // Radius for coffee shop in kilometers
+    const userRadius = accuracy / 1000; // Convert accuracy to kilometers
+    
+    const distance = haversineDistance(
+      { lat: coffeeShopLocation[0], lng: coffeeShopLocation[1] },
+      location
+    );
+
+    if (distance <= (userRadius + coffeeShopRadius)) {
+      alert('The radius meet.');
+    }
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -69,7 +97,6 @@ function Home({ updateOrders }) { // Accept updateOrders as a prop
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude, accuracy: locationAccuracy } = position.coords;
-          setUserLocation([latitude, longitude]); 
           setAccuracy(locationAccuracy);
 
           if (locationAccuracy > 20) {
@@ -97,7 +124,14 @@ function Home({ updateOrders }) { // Accept updateOrders as a prop
           };
           console.log('Form Data:', JSON.stringify(dataToSend));
 
-          // Call updateOrders to pass the order data to the parent component
+          // Update locations state to include the new location
+          setUserLocations((prevLocations) => {
+            const newLocations = [...prevLocations, { lat: latitude, lng: longitude }];
+            // Check for radius meeting after updating locations
+            newLocations.forEach(checkRadiusMeeting);
+            return newLocations;
+          });
+
           updateOrders(dataToSend); // Pass the order data up
 
           setNotificationVisible(true);
@@ -160,37 +194,49 @@ function Home({ updateOrders }) { // Accept updateOrders as a prop
       )}
 
       {/* Map Display */}
-      <MapContainer center={userLocation} zoom={13} ref={mapRef} style={{ height: "400px", width: "100%" }}>
-        <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        />
-        {/* User Location Marker */}
-        <Marker position={userLocation} icon={customIcon}>
-          <Popup>Your current location</Popup>
-        </Marker>
-        <Circle center={userLocation} radius={accuracy} fillColor="blue" />
-        
-        {/* Coffee Shop Location Marker */}
-        <Marker position={coffeeShopLocation} icon={customIcon}>
-          <Popup>Coffee Shop Location</Popup>
-        </Marker>
-      </MapContainer>
+      <div className="map-wrapper">
+        <div className="map-container">
+          <MapContainer center={coffeeShopLocation} zoom={13} ref={mapRef} style={{ height: "400px", width: "100%" }}>
+            <TileLayer
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            />
+            
+            {/* Render User Location Markers */}
+            {userLocations.map((location, index) => (
+              <Marker key={index} position={location} icon={customIcon}>
+                <Popup>Your order location</Popup>
+              </Marker>
+            ))}
+            
+            {/* Coffee Shop Location Marker */}
+            <Marker position={coffeeShopLocation} icon={customIcon}>
+              <Popup>Coffee Shop Location</Popup>
+            </Marker>
+
+            {/* Circles for Accuracy */}
+            {userLocations.map((location, index) => (
+              <Circle key={index} center={location} radius={accuracy} fillColor="blue" fillOpacity={0.2} />
+            ))}
+            <Circle center={coffeeShopLocation} radius={50} fillColor="green" fillOpacity={0.2} /> {/* Example radius for coffee shop */}
+          </MapContainer>
+        </div>
+      </div>
 
       {/* Carousel Component */}
       <div className="carousel-container">
-        <Carousel showThumbs={true} thumbWidth={40}>
+        <Carousel>
           <div>
-            <img src="\coffee-stock-600x450.jpg" alt="Coffee" className="carousel-image" />
-            <p className="legend">Slide 1</p>
+            <img src="\coffee-stock-600x450.jpg" alt="Coffee" />
+            <p className="legend">Coffee Image 1</p>
           </div>
           <div>
-            <img src="\Orangejuice.jpg" alt="Juice" className="carousel-image" />
-            <p className="legend">Slide 2</p>
+            <img src="\easy_chocolate_cake_slice-500x500.jpg" alt="Coffee" />
+            <p className="legend">Coffee Image 2</p>
           </div>
           <div>
-            <img src="\easy_chocolate_cake_slice-500x500.jpg" alt="Cake" className="carousel-image" />
-            <p className="legend">Slide 3</p>
+            <img src="\Orangejuice.jpg" alt="Coffee" />
+            <p className="legend">Coffee Image 3</p>
           </div>
         </Carousel>
       </div>

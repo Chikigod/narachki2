@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import './register.css'; // Import the Register CSS
 
 function Register() {
     const [email, setEmail] = useState('');
@@ -38,7 +39,7 @@ function Register() {
     };
 
     return (
-        <div>
+        <div className="register-container">
             <h2>Register</h2>
             <form onSubmit={handleSubmit}>
                 <input

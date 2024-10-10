@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Circle } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import './WaiterView.css'; // Import the CSS file
 
 // Custom icon for the marker
 const customIcon = new L.Icon({
@@ -40,7 +41,7 @@ function WaiterView({ orders }) { // Accept orders as a prop
   }, []);
 
   return (
-    <div>
+    <div className="waiter-view-container"> {/* Apply the container class here */}
       <h1>Order Tracking</h1>
 
       {orders.length > 0 && (
