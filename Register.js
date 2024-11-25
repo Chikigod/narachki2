@@ -10,13 +10,16 @@ function Register() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        // Check if passwords match
         if (password !== confirmPassword) {
             alert('Passwords do not match!');
             return;
         }
 
         try {
-            const response = await fetch('https://localhost:7118/api/User/register', {
+            // Sending POST request to the API for user registration
+            const response = await fetch('https://localhost:7118/api/KipreLogin/register', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -24,13 +27,15 @@ function Register() {
                 body: JSON.stringify({ email, password }),
             });
 
-            const data = await response.text(); 
+            const data = await response.text(); // Get the response text (message or error)
+            
+            // Check if registration is successful
             if (response.ok) {
                 console.log('Registration successful:', data);
-                navigate('/login');
+                navigate('/login'); // Redirect to the login page
             } else {
                 console.error('Registration failed:', data);
-                alert(data);
+                alert(data); // Display the error message
             }
         } catch (error) {
             console.error('Error registering:', error);

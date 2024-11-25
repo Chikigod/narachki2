@@ -23,7 +23,8 @@ function Login() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch('https://localhost:7118/api/User/login', {
+            // Sending a POST request to the KipreLogin API for authentication
+            const response = await fetch('https://localhost:7118/api/KipreLogin/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -32,10 +33,12 @@ function Login() {
             });
 
             const data = await response.json();
+
+            // Check if the login is successful
             if (response.ok) {
-                
-                dispatch(loginUser({ email, token: data.accessToken })); 
-                navigate('/home');
+                // Assuming the API returns an access token, dispatch it to Redux
+                dispatch(loginUser({ email, token: data.accessToken }));
+                navigate('/home'); // Redirect to home page after successful login
             } else {
                 alert('Login failed. Please check your credentials.');
             }

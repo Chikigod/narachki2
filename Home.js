@@ -5,6 +5,7 @@ import L from 'leaflet';
 import "react-responsive-carousel/lib/styles/carousel.min.css"; 
 import { Carousel } from 'react-responsive-carousel';
 import './index.css'; 
+import axios from 'axios'; // Add this import to use Axios for API requests
 
 const customIcon = new L.Icon({
   iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
@@ -93,34 +94,35 @@ function Home({ updateOrders }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (position) => {
+        async (position) => {
           const { latitude, longitude, accuracy: locationAccuracy } = position.coords;
           setAccuracy(locationAccuracy);
 
           if (locationAccuracy > 20) {
-            alert("Please turn on your GPS"); 
-            return; 
+            alert("Please turn on your GPS");
+            return;
           }
 
           const userAgent = navigator.userAgent;
-          const browserName = getBrowserName(userAgent); 
-          const osName = getOSName(userAgent); 
+          const browserName = getBrowserName(userAgent);
+          const osName = getOSName(userAgent);
           const windowSize = { width: window.innerWidth, height: window.innerHeight };
           const deviceSize = { width: window.screen.width, height: window.screen.height };
-          const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone; 
+          const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-          const dataToSend = { 
-            name: formData.name, 
-            orderTypeId: formData.orderType, 
-            location: { lat: latitude, lng: longitude }, // Use the user's location for the order
-            browser: browserName, 
-            os: osName, 
-            appVersion, 
-            windowSize, 
-            deviceSize, 
-            timeZone 
+          const dataToSend = {
+            name: formData.name,
+            orderTypeId: formData.orderType,
+            location: { lat: latitude, lng: longitude }, // User's location
+            browser: browserName,
+            os: osName,
+            appVersion,
+            windowSize,
+            deviceSize,
+            timeZone
           };
           console.log('Form Data:', JSON.stringify(dataToSend));
 
@@ -132,18 +134,32 @@ function Home({ updateOrders }) {
             return newLocations;
           });
 
-          updateOrders(dataToSend); // Pass the order data up
+          // Send the data to your backend API using Axios
+          try {
+            const response = await axios.post(
+              'https://localhost:7159/api/KipreHome', // Change this to your actual API endpoint
+              dataToSend
+            );
+            console.log('Order successfully submitted:', response.data);
 
-          setNotificationVisible(true);
+            // Pass the order data up to update parent component state
+            updateOrders(response.data); 
 
-          if (Notification.permission === "granted") {
-            new Notification("Waiter is coming!");
-          } else if (Notification.permission !== "denied") {
-            Notification.requestPermission().then((permission) => {
-              if (permission === "granted") {
-                new Notification("Waiter is coming!");
-              }
-            });
+            // Show the notification
+            setNotificationVisible(true);
+
+            if (Notification.permission === "granted") {
+              new Notification("Waiter is coming!");
+            } else if (Notification.permission !== "denied") {
+              Notification.requestPermission().then((permission) => {
+                if (permission === "granted") {
+                  new Notification("Waiter is coming!");
+                }
+              });
+            }
+          } catch (error) {
+            console.error('Error submitting order:', error);
+            alert('Failed to submit your order. Please try again.');
           }
         },
         (error) => {
